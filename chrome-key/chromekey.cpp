@@ -2,6 +2,8 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>  // cv::Canny()
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/video.hpp>
 #include <iostream>
 
 using namespace cv;
@@ -9,9 +11,19 @@ using std::cout; using std::cerr; using std::endl;
 
 int main(int, char**)
 {
-    Mat frame;
+    Mat frame, fgMask;
+    Mat processed;
+    int64 tp0;
+
+    //create Background Subtractor objects
+    Ptr<BackgroundSubtractor> pBackSub;
+
+    pBackSub = createBackgroundSubtractorMOG2();
+    //pBackSub = createBackgroundSubtractorKNN();
+
     cout << "Opening camera..." << endl;
     VideoCapture capture(0); // open the first camera
+
     if (!capture.isOpened())
     {
         cerr << "ERROR: Can't initialize camera capture" << endl;
@@ -55,15 +67,21 @@ int main(int, char**)
             imshow("Frame", frame);
 	    break;
 	case 1:
-            int64 tp0 = cv::getTickCount();
-            Mat processed;
+            tp0 = cv::getTickCount();
             cv::Canny(frame, processed, 400, 1000, 5);
             processingTime += cv::getTickCount() - tp0;
             imshow("Frame", processed);
 	    break;
+	case 2:
+	    //update the background model
+            tp0 = cv::getTickCount();
+            pBackSub->apply(frame, fgMask);
+            processingTime += cv::getTickCount() - tp0;
+            imshow("Frame", fgMask);
+	    break;
         }
         int key = waitKey(1);
-        if (key == 27/*ESC*/)
+        if (key == 27/*ESC*/ || key == 'q')
             break;
         if (key == 32/*SPACE*/)
         {
@@ -75,9 +93,15 @@ int main(int, char**)
         }
         if (key == 49/* 1 */)
         {
+		enableProcessing = 2;
         }
         if (key == 50/* 2 */)
         {
+		cout << "dos" << endl;
+        }
+        if (key == '0')
+        {
+		enableProcessing = 0;
         }
     }
     std::cout << "Number of captured frames: " << nFrames << endl;
