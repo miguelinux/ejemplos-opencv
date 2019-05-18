@@ -62,7 +62,7 @@ int main(int, char**)
             processingTime += cv::getTickCount() - tp0;
             imshow("Frame", processed);
         }
-        int key = waitKey(0);
+        int key = waitKey(1);
         if (key == 27/*ESC*/)
             break;
         if (key == 32/*SPACE*/)
