@@ -26,7 +26,7 @@ int main(int, char**)
     cout << endl << "Start grabbing..." << endl;
 
     size_t nFrames = 0;
-    bool enableProcessing = false;
+    short enableProcessing = 0;
     int64 t0 = cv::getTickCount();
     int64 processingTime = 0;
     for (;;)
@@ -50,25 +50,34 @@ int main(int, char**)
             t0 = t1;
             processingTime = 0;
         }
-        if (!enableProcessing)
-        {
+        switch (enableProcessing) {
+	case 0:
             imshow("Frame", frame);
-        }
-        else
-        {
+	    break;
+	case 1:
             int64 tp0 = cv::getTickCount();
             Mat processed;
             cv::Canny(frame, processed, 400, 1000, 5);
             processingTime += cv::getTickCount() - tp0;
             imshow("Frame", processed);
+	    break;
         }
         int key = waitKey(1);
         if (key == 27/*ESC*/)
             break;
         if (key == 32/*SPACE*/)
         {
-            enableProcessing = !enableProcessing;
+            if (enableProcessing)
+		enableProcessing = 0;
+	    else
+		enableProcessing = 1;
             cout << "Enable frame processing ('space' key): " << enableProcessing << endl;
+        }
+        if (key == 49/* 1 */)
+        {
+        }
+        if (key == 50/* 2 */)
+        {
         }
     }
     std::cout << "Number of captured frames: " << nFrames << endl;
