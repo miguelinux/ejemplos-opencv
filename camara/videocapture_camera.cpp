@@ -70,7 +70,6 @@ int main(int, char**)
             enableProcessing = !enableProcessing;
             cout << "Enable frame processing ('space' key): " << enableProcessing << endl;
         }
-
     }
     std::cout << "Number of captured frames: " << nFrames << endl;
     return nFrames > 0 ? 0 : 1;
