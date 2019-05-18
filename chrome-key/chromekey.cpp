@@ -18,8 +18,8 @@ int main(int, char**)
     //create Background Subtractor objects
     Ptr<BackgroundSubtractor> pBackSub;
 
-    pBackSub = createBackgroundSubtractorMOG2();
-    //pBackSub = createBackgroundSubtractorKNN();
+    //pBackSub = createBackgroundSubtractorMOG2();
+    pBackSub = createBackgroundSubtractorKNN();
 
     cout << "Opening camera..." << endl;
     VideoCapture capture(0); // open the first camera
@@ -79,6 +79,27 @@ int main(int, char**)
             processingTime += cv::getTickCount() - tp0;
             imshow("Frame", fgMask);
 	    break;
+	case 3:
+	    //update the background model
+            tp0 = cv::getTickCount();
+            pBackSub->apply(frame, fgMask);
+	    // smooth the mask to reduce noise in image
+            GaussianBlur(fgMask, fgMask, Size(11,11), 3.5,3.5);
+	    // threshold mask to saturate at black and white values
+            threshold(fgMask, fgMask, 10,255,THRESH_BINARY);
+
+	    // create black foreground image
+            processed = Scalar::all(0);
+
+            // Copy source image to foreground image only in area with white mask
+            frame.copyTo(processed, fgMask);
+       
+            //Get background image
+            //bg_model->getBackgroundImage(backgroundImage);
+
+            processingTime += cv::getTickCount() - tp0;
+            imshow("Frame", processed);
+	    break;
         }
         int key = waitKey(1);
         if (key == 27/*ESC*/ || key == 'q')
@@ -97,7 +118,7 @@ int main(int, char**)
         }
         if (key == 50/* 2 */)
         {
-		cout << "dos" << endl;
+		enableProcessing = 3;
         }
         if (key == '0')
         {
