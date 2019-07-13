@@ -81,7 +81,11 @@ int main( int argc, char** argv )
         if( needToInit )
         {
             // automatic initialization
+#if CV_VERSION_MAJOR == 4
             goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 3, 3, 0, 0.04);
+#else
+            goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 3,    0, 0.04);
+#endif /* CV_VERSION_MAJOR == 4 */
             cornerSubPix(gray, points[1], subPixWinSize, Size(-1,-1), termcrit);
             addRemovePt = false;
         }
