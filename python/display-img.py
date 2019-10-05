@@ -12,9 +12,15 @@ img = cv.imread('../resources/lena.jpg',0)
 #print(img)
 
 cv.imshow('Lena',img)
-k = cv.waitKey(0)
-if k == 27:         # wait for ESC key to exit
-    cv.destroyAllWindows()
-elif k == ord('s'): # wait for 's' key to save and exit
+print("Oprime ESC para salir")
+
+while True:
+  k = cv.waitKey(0)
+
+  if k == 27:         # wait for ESC key to exit
+    break
+  elif k == ord('s'): # wait for 's' key to save and exit
     cv.imwrite('lena-gray.png',img)
-    cv.destroyAllWindows()
+    print("Imagen guardada")
+
+cv.destroyAllWindows()
